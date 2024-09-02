@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Research Project Matcher</title>
-<<<<<<< HEAD
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../static/style.css">
     <link rel="shortcut icon" href="../static/logo_white.png" type="image/x-icon">
@@ -53,103 +52,15 @@
             }
         }
     
-=======
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #343a40;
-        }
-        textarea {
-            resize: none;
-            height: 150px;
-        }
-        button {
-            width: 100%;
-            position: relative;
-        }
-        button .spinner-border {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 1rem;
-            height: 1rem;
-            margin-top: -0.5rem;
-            margin-left: -0.5rem;
-            display: none;
-        }
-        #result, #faculty-result {
-            margin-top: 20px;
-        }
-        #faculty-result ul {
-            padding-left: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Research Project Matcher</h1>
-        <form id="description-form">
-            <div class="mb-3">
-                <textarea class="form-control" name="description" placeholder="Enter project description..."></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">
-                Expand Description
-                <div class="spinner-border spinner-border-sm" role="status"></div>
-            </button>
-        </form>
-        <div id="result" class="alert alert-secondary mt-3" role="alert"></div>
-        <button id="find-faculties-btn" type="button" class="btn btn-success mt-3">
-            Find Faculties
-            <div class="spinner-border spinner-border-sm" role="status"></div>
-        </button>
-        <div id="faculty-result" class="mt-3"></div>
-    </div>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
-    <script>
-        function toggleButtonLoading(button, isLoading) {
-            const spinner = button.querySelector('.spinner-border');
-            if (isLoading) {
-                button.disabled = true;
-                spinner.style.display = 'inline-block';
-            } else {
-                button.disabled = false;
-                spinner.style.display = 'none';
-            }
-        }
-
->>>>>>> a086e82ae47e876694f1b9e22ac44c0d5067fe94
         document.getElementById('description-form').onsubmit = function(event) {
             event.preventDefault();
             const button = this.querySelector('button');
             toggleButtonLoading(button, true);
-<<<<<<< HEAD
     
-=======
-
->>>>>>> a086e82ae47e876694f1b9e22ac44c0d5067fe94
             const formData = new FormData(this);
             fetch('/expand_description', {
                 method: 'POST',
                 body: formData
-<<<<<<< HEAD
             }).then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -177,47 +88,6 @@
             }).finally(() => {
                 toggleButtonLoading(button, false);
             });
-=======
-            }).then(response => response.json())
-              .then(data => {
-                  document.getElementById('result').innerText = data.project_description;
-                  document.getElementById('result').classList.add('alert', 'alert-info');
-              })
-              .finally(() => {
-                  toggleButtonLoading(button, false);
-              });
-        };
-
-        document.getElementById('find-faculties-btn').onclick = function() {
-            const button = this;
-            toggleButtonLoading(button, true);
-
-            const projectDescription = document.getElementById('result').innerText;
-            if (!projectDescription) {
-                alert('Please expand the project description first.');
-                toggleButtonLoading(button, false);
-                return;
-            }
-            fetch('/find_faculties', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ project_description: projectDescription })
-            }).then(response => response.json())
-              .then(data => {
-                  if (data.error) {
-                      document.getElementById('faculty-result').innerText = `Error: ${data.error}`;
-                      document.getElementById('faculty-result').classList.add('alert', 'alert-danger');
-                  } else {
-                      const facultyList = data.map(faculty => `<li class="list-group-item">${faculty.Name} (Similarity Score: ${faculty.SimilarityScore.toFixed(2)})</li>`).join('');
-                      document.getElementById('faculty-result').innerHTML = `<ul class="list-group">${facultyList}</ul>`;
-                  }
-              })
-              .finally(() => {
-                  toggleButtonLoading(button, false);
-              });
->>>>>>> a086e82ae47e876694f1b9e22ac44c0d5067fe94
         };
     </script>
 </body>
