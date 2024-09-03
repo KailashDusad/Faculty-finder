@@ -110,7 +110,9 @@ def find_matching_faculties(prompt, faculty_data, faculty_embeddings):
                 "SimilarityScore": float(similarity_score),
                 "Department": faculty_info["Department"],
                 "Profile Picture": faculty_info["Profile Picture"],
-                "Profile link": faculty_info["Profile link"]
+                "Profile link": faculty_info["Profile link"],
+                "Office location": faculty_info["Office location"],
+                "Email ID": faculty_info["Email ID"]
             })
         logging.debug("Sorting faculty matches")
         faculty_matches.sort(key=lambda x: x["SimilarityScore"], reverse=True)
@@ -130,7 +132,9 @@ def find_matching_faculties_from_keywords(query_embedding, faculty_data, faculty
                 "SimilarityScore": float(similarity_score),
                 "Department": faculty_info["Department"],
                 "Profile Picture": faculty_info["Profile Picture"],
-                "Profile link": faculty_info["Profile link"]
+                "Profile link": faculty_info["Profile link"],
+                "Office location": faculty_info["Office location"],
+                "Email ID": faculty_info["Email ID"]
             })
         logging.debug("Sorting faculty matches")
         faculty_matches.sort(key=lambda x: x["SimilarityScore"], reverse=True)

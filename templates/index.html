@@ -7,15 +7,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../static/style.css">
     <link rel="shortcut icon" href="../static/logo_white.png" type="image/x-icon">
-    <style>
-        #tag-suggestions option {
-            font-size: 14px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            background-color: #f9f9f9;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
     <nav>
@@ -31,11 +22,16 @@
         <p>Work with us to undertake Research & Development that is profoundly inspired and globally connected.</p>
         <div class="search-bar-container">
             <form id="description-form">
-                <input class="search-bar form-control" name="description" placeholder="Enter project description..."></input>
+                <input class="search-bar form-control" name="description" placeholder="Enter project description...">
                 <div class="search-options">
                     <span style="margin-right: 10px;">☰</span>
+                    <div class="search-options-dropdown">
+                        <button type="button" style="box-shadow: 0 0px 0px rgba(0, 0, 0, 0);" onclick="toggleSearch('description')">Text-Based Search</button>
+                        
+                        <button type="button" style="margin-bottom: 4px; background-color: white; outline: none; box-shadow: 0 0px 0px rgba(0, 0, 0, 0);" onclick="toggleSearch('keywords')">Keyword-Based Search</button>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">
+                <button style="width: 50%;" type="submit" id="disc" class="btn btn-primary">
                     <span>Find Faculty</span>
                     <div class="spinner-border spinner-border-sm" role="status"></div>
                 </button>
@@ -44,9 +40,14 @@
                 <input class="search-bar form-control" name="keywords" placeholder="Enter keywords..." list="tag-suggestions">
                 <div class="search-options">
                     <span style="margin-right: 10px;">☰</span>
+                    <div class="search-options-dropdown">
+                        <button type="button" style="box-shadow: 0 0px 0px rgba(0, 0, 0, 0);" onclick="toggleSearch('description')">Text-Based Search</button>
+                        
+                        <button type="button" style="margin-bottom: 4px;  background-color: white; outline: none; box-shadow: 0 0px 0px rgba(0, 0, 0, 0);" onclick="toggleSearch('keywords')">Keyword-Based Search</button>
+                    </div>
                 </div>
                 <datalist id="tag-suggestions"></datalist>
-                <button type="submit" class="btn btn-primary">
+                <button style="width: 50%;" type="submit" id="key" class="btn btn-primary">
                     <span>Find Faculty by Keywords</span>
                     <div class="spinner-border spinner-border-sm" role="status"></div>
                 </button>
@@ -57,148 +58,156 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function toggleButtonLoading(button, isLoading) {
-            const spinner = button.querySelector('.spinner-border');
-            const buttonText = button.querySelector('span');
+        document.addEventListener('DOMContentLoaded', function() {
+            function toggleButtonLoading(button, isLoading) {
+                const spinner = button.querySelector('.spinner-border');
+                const buttonText = button.querySelector('span');
 
-            if (isLoading) {
-                button.disabled = true;
-                buttonText.style.display = 'none';
-                spinner.style.display = 'inline-block';
-            } else {
-                button.disabled = false;
-                buttonText.style.display = 'inline-block';
-                spinner.style.display = 'none';
-            }
-        }
-
-        async function fetchTags(query) {
-            try {
-                const response = await fetch('/available_tags');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                if (isLoading) {
+                    button.disabled = true;
+                    buttonText.style.display = 'none';
+                    spinner.style.display = 'inline-block';
+                } else {
+                    button.disabled = false;
+                    buttonText.style.display = 'inline-block';
+                    spinner.style.display = 'none';
                 }
-                const tags = await response.json();
-                const filteredTags = tags.filter(tag => tag.toLowerCase().includes(query.toLowerCase()))
-                                         .slice(0, 6); // Get top 6 matches
+            }
 
-                const datalist = document.getElementById('tag-suggestions');
-                datalist.innerHTML = '';
-                filteredTags.forEach(tag => {
-                    const option = document.createElement('option');
-                    option.value = tag;
-                    datalist.appendChild(option);
+            async function fetchTags(query) {
+                try {
+                    const response = await fetch('/available_tags');
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const tags = await response.json();
+                    const filteredTags = tags.filter(tag => tag.toLowerCase().includes(query.toLowerCase()))
+                                             .slice(0, 10); 
+
+                    const datalist = document.getElementById('tag-suggestions');
+                    datalist.innerHTML = '';
+                    filteredTags.forEach(tag => {
+                        const option = document.createElement('option');
+                        option.value = tag;
+                        datalist.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Error fetching tags:', error);
+                }
+            }
+
+            document.getElementById('keywords-form').keywords.addEventListener('input', function(event) {
+                const query = event.target.value;
+                if (query.length >= 2) { 
+                    fetchTags(query);
+                }
+            });
+
+            document.getElementById('description-form').onsubmit = function(event) {
+                event.preventDefault();
+                // const button = this.querySelector('button'); 
+                const button = document.getElementById('disc'); 
+                toggleButtonLoading(button, true);
+
+                const formData = new FormData(this);
+                fetch('/expand_description', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                }).then(data => {
+                    if (data.error) {
+                        document.getElementById('faculty-result').innerText = `Error: ${data.error}`;
+                        document.getElementById('faculty-result').classList.add('alert', 'alert-danger');
+                    } else {
+                        const facultyList = data.map(faculty => `
+                            <li class="list-group-item d-flex align-items-center" style="width:100%;justify-content: space-around;">
+                                <img src="${faculty['Profile Picture']}" alt="${faculty.Name}'s profile picture" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                                <div style="width:90%;display: flex; flex-direction:column; align-items: center; justify-content: center;">
+                                    <a href="${faculty['Profile link']}" target="_blank" class="fw-bold">${faculty.Name}</a>
+                                    <p class="mb-1">Department: ${faculty.Department}</p>
+                                    ${faculty['Email ID'] ? `<p class="mb-1">Email: ${faculty['Email ID']}</p>` : ''}
+                                    ${faculty['Office location'] ? `<p class="mb-1">Office: ${faculty['Office location']}</p>` : ''}
+                                </div>
+                            </li>`).join('');
+                        document.getElementById('faculty-result').innerHTML = `<ul id="faculty-ul" class="list-group">${facultyList}</ul>`;
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while expanding the description.');
+                }).finally(() => {
+                    toggleButtonLoading(button, false);
                 });
-            } catch (error) {
-                console.error('Error fetching tags:', error);
-            }
-        }
+            };
 
-        document.getElementById('keywords-form').keywords.addEventListener('input', function(event) {
-            const query = event.target.value;
-            if (query.length >= 2) { 
-                fetchTags(query);
-            }
+            document.getElementById('keywords-form').onsubmit = function(event) {
+                event.preventDefault();
+                // const button = this.querySelector('button');
+                const button = document.getElementById('key');
+                toggleButtonLoading(button, true);
+
+                const formData = new FormData(this);
+                fetch('/search_by_keywords', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                }).then(data => {
+                    if (data.error) {
+                        document.getElementById('faculty-result').innerText = `Error: ${data.error}`;
+                        document.getElementById('faculty-result').classList.add('alert', 'alert-danger');
+                    } else {
+                        const facultyList = data.map(faculty => `
+                            <li class="list-group-item d-flex align-items-center" style="width:100%;justify-content: space-around;">
+                                <img src="${faculty['Profile Picture']}" alt="${faculty.Name}'s profile picture" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                                <div style="width:90%;display: flex; flex-direction:column; align-items: center; justify-content: center;">
+                                    <a href="${faculty['Profile link']}" target="_blank" class="fw-bold">${faculty.Name}</a>
+                                    <p class="mb-1">Department: <span style="">${faculty.Department}</span></p>
+                                    ${faculty['Email ID'] ? `<p class="mb-1">Email: ${faculty['Email ID']}</p>` : ''}
+                                    ${faculty['Office location'] ? `<p class="mb-1">Office: ${faculty['Office location']}</p>` : ''}
+                                </div>
+                            </li>`).join('');
+                        document.getElementById('faculty-result').innerHTML = `<ul class="list-group">${facultyList}</ul>`;
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while searching by keywords.');
+                }).finally(() => {
+                    toggleButtonLoading(button, false);
+                });
+            };
+
+            document.querySelectorAll('.search-options > span').forEach(span => {
+                span.addEventListener('click', function() {
+                    const dropdown = this.nextElementSibling;
+                    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+                });
+            });
+
+            window.addEventListener('click', function(event) {
+                if (!event.target.matches('.search-options > span')) {
+                    document.querySelectorAll('.search-options-dropdown').forEach(dropdown => {
+                        dropdown.style.display = 'none';
+                    });
+                }
+            });
         });
 
-        document.getElementById('description-form').onsubmit = function(event) {
-            event.preventDefault();
-            const button = this.querySelector('button');
-            toggleButtonLoading(button, true);
-
-            const formData = new FormData(this);
-            fetch('/expand_description', {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            }).then(data => {
-                if (data.error) {
-                    document.getElementById('faculty-result').innerText = `Error: ${data.error}`;
-                    document.getElementById('faculty-result').classList.add('alert', 'alert-danger');
-                } else {
-                    const facultyList = data.map(faculty => `
-                        <li class="list-group-item d-flex align-items-center" style="width:100%;justify-content: space-around;">
-                            <img src="${faculty['Profile Picture']}" alt="${faculty.Name}'s profile picture" class="img-thumbnail me-3" style="width: 50px; height: 50px; object-fit: cover;">
-                            <div style="width:90%;display: flex; flex-direction:column; align-items: center; justify-content: center;">
-                                <a href="${faculty['Profile link']}" target="_blank" class="fw-bold">${faculty.Name}</a>
-                                <p class="mb-1">Department: ${faculty.Department}</p>
-                                <p class="mb-0">Similarity Score: ${faculty.SimilarityScore.toFixed(2)}</p>
-                            </div>
-                        </li>`).join('');
-                    document.getElementById('faculty-result').innerHTML = `<ul class="list-group">${facultyList}</ul>`;
-                }
-            }).catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while expanding the description.');
-            }).finally(() => {
-                toggleButtonLoading(button, false);
-            });
-        };
-
-        document.getElementById('keywords-form').onsubmit = function(event) {
-            event.preventDefault();
-            const button = this.querySelector('button');
-            toggleButtonLoading(button, true);
-
-            const formData = new FormData(this);
-            fetch('/search_by_keywords', {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            }).then(data => {
-                if (data.error) {
-                    document.getElementById('faculty-result').innerText = `Error: ${data.error}`;
-                    document.getElementById('faculty-result').classList.add('alert', 'alert-danger');
-                } else {
-                    const facultyList = data.map(faculty => `
-                        <li class="list-group-item d-flex align-items-center" style="width:100%;justify-content: space-around;">
-                            <img src="${faculty['Profile Picture']}" alt="${faculty.Name}'s profile picture" class="img-thumbnail me-3" style="width: 50px; height: 50px; object-fit: cover;">
-                            <div style="width:90%;display: flex; flex-direction:column; align-items: center; justify-content: center;">
-                                <a href="${faculty['Profile link']}" target="_blank" class="fw-bold">${faculty.Name}</a>
-                                <p class="mb-1">Department: ${faculty.Department}</p>
-                                <p class="mb-0">Similarity Score: ${faculty.SimilarityScore.toFixed(2)}</p>
-                            </div>
-                        </li>`).join('');
-                    document.getElementById('faculty-result').innerHTML = `<ul class="list-group">${facultyList}</ul>`;
-                }
-            }).catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while searching by keywords.');
-            }).finally(() => {
-                toggleButtonLoading(button, false);
-            });
-        };
-
-        document.querySelector('.search-options span').onclick = function() {
-            const descriptionForm = document.getElementById('description-form');
-            const keywordsForm = document.getElementById('keywords-form');
-            if (descriptionForm.style.display == 'none') {
-                descriptionForm.style.display = 'block';
-                keywordsForm.style.display = 'none';
+        function toggleSearch(method) {
+            if (method === 'description') {
+                document.getElementById('description-form').style.display = 'block';
+                document.getElementById('keywords-form').style.display = 'none';
+            } else if (method === 'keywords') {
+                document.getElementById('description-form').style.display = 'none';
+                document.getElementById('keywords-form').style.display = 'block';
             }
-
-            else if (keywordsForm.style.display == 'block') {
-                descriptionForm.style.display = 'block';
-                keywordsForm.style.display = 'none';
-            }
-            else if (descriptionForm.style.display == 'block') {
-                descriptionForm.style.display = 'none';
-                keywordsForm.style.display = 'block';
-            }
-
-            else {
-                descriptionForm.style.display = 'none';
-                keywordsForm.style.display = 'block';
-            }
-        };
+        }
     </script>
 </body>
 </html>

@@ -1,51 +1,36 @@
-
+/* General Styles */
 body {
-    /* background-image: url('./campus1.jpg');  */
     background-size: cover;
     background-position: center;
-    /* background-attachment: fixed; */
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svgjs='http://svgjs.dev/svgjs' width='1440' height='1200' preserveAspectRatio='none' viewBox='0 0 1440 1200'%3e%3cg mask='url(%26quot%3b%23SvgjsMask1000%26quot%3b)' fill='none'%3e%3crect width='1440' height='1200' x='0' y='0' fill='%230e2a47'%3e%3c/rect%3e%3cpath d='M167 1200L1367 0L2268.5 0L1068.5 1200z' fill='url(%26quot%3b%23SvgjsLinearGradient1001%26quot%3b)'%3e%3c/path%3e%3cpath d='M1367 1200L167 0L-149.5 0L1050.5 1200z' fill='url(%26quot%3b%23SvgjsLinearGradient1002%26quot%3b)'%3e%3c/path%3e%3cpath d='M425.9614175770606 1200L1440 185.96141757706062L1440 1200z' fill='url(%26quot%3b%23SvgjsLinearGradient1001%26quot%3b)'%3e%3c/path%3e%3cpath d='M0 1200L1014.0385824229394 1200L 0 185.96141757706062z' fill='url(%26quot%3b%23SvgjsLinearGradient1002%26quot%3b)'%3e%3c/path%3e%3c/g%3e%3cdefs%3e%3cmask id='SvgjsMask1000'%3e%3crect width='1440' height='1200' fill='white'%3e%3c/rect%3e%3c/mask%3e%3clinearGradient x1='0%25' y1='100%25' x2='100%25' y2='0%25' id='SvgjsLinearGradient1001'%3e%3cstop stop-color='rgba(15%2c 70%2c 185%2c 0.2)' offset='0'%3e%3c/stop%3e%3cstop stop-opacity='0' stop-color='rgba(15%2c 70%2c 185%2c 0.2)' offset='0.66'%3e%3c/stop%3e%3c/linearGradient%3e%3clinearGradient x1='100%25' y1='100%25' x2='0%25' y2='0%25' id='SvgjsLinearGradient1002'%3e%3cstop stop-color='rgba(15%2c 70%2c 185%2c 0.2)' offset='0'%3e%3c/stop%3e%3cstop stop-opacity='0' stop-color='rgba(15%2c 70%2c 185%2c 0.2)' offset='0.66'%3e%3c/stop%3e%3c/linearGradient%3e%3c/defs%3e%3c/svg%3e");
     color: white;
     font-family: Arial, sans-serif;
 }
 
-/* body::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: -1;
-} */
 .nav-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    /* position: fixed; */
     width: 100%;
     z-index: 1000;
     background-color: #fff;
 }
 
-.logo{
+.logo {
     font-size: 1.5rem;
     font-weight: bold;
     color: black;
     display: flex;
     align-items: center;
-    justify-content: center;
 }
+
 .logo img {
     width: 60px;
     height: 60px;
     border-radius: 50%;
     margin-right: 1rem;
-    margin-left: 5rem;
 }
-
 
 .content-container {
     display: flex;
@@ -70,7 +55,8 @@ body {
 
 .search-bar-container {
     position: relative;
-    width: 60%;
+    width: 100%;
+    max-width: 600px;
 }
 
 .search-bar {
@@ -80,15 +66,10 @@ body {
     border: none;
     width: 100%;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    
-    
 }
 
 .search-bar::placeholder {
     color: #6c757d;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .search-options {
@@ -98,7 +79,6 @@ body {
     color: #6c757d;
     cursor: pointer;
 }
-
 
 button {
     margin-top: 20px;
@@ -134,4 +114,101 @@ button .spinner-border {
     padding: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     color: #000;
+}
+
+#tag-suggestions option {
+    font-size: 14px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+.search-options-dropdown {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    display: none;
+    background-color: white;
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+    border-radius: 5px;
+    z-index: 1000;
+    min-width: 250px;
+}
+
+.search-options-dropdown button {
+    background-color: white;
+    border: none;
+    padding: 10px 10px;
+    text-align: left;
+    width: 90%;
+    color: #000;
+    cursor: pointer;
+    outline: none;
+    margin-top: 5px;
+}
+
+
+.spinner-border {
+    display: none;
+}
+
+#faculty-result ul {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: auto;
+    gap: 20px;
+}
+@media (min-width: 768px) {
+    #faculty-result ul {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .content-container h1 {
+        font-size: 2.5rem;
+    }
+
+    .content-container p {
+        font-size: 1rem;
+    }
+
+    .search-bar-container {
+        width: 90%;
+    }
+
+    .search-options-dropdown {
+        min-width: 200px;
+    }
+}
+
+@media (max-width: 576px) {
+    .content-container h1 {
+        font-size: 2rem;
+    }
+
+    .content-container p {
+        font-size: 0.9rem;
+    }
+
+    .search-bar {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
+
+    button {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
+
+    .logo img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+    }
 }
